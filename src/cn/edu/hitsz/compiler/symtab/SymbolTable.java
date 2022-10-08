@@ -5,6 +5,7 @@ import cn.edu.hitsz.compiler.utils.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,12 @@ import java.util.Map;
  */
 public class SymbolTable {
 
+    private ArrayList<SymbolTableEntry> items;
+
+    public SymbolTable() {
+        items = new ArrayList<>();
+    }
+
     /**
      * 获取符号表中已有的条目
      *
@@ -24,7 +31,11 @@ public class SymbolTable {
      * @throws RuntimeException 该符号在表中不存在
      */
     public SymbolTableEntry get(String text) {
-        throw new NotImplementedException();
+        for (SymbolTableEntry item : items) {
+            if (item.getText().equals(text))
+                return item;
+        }
+        return null;
     }
 
     /**
@@ -35,7 +46,9 @@ public class SymbolTable {
      * @throws RuntimeException 该符号已在表中存在
      */
     public SymbolTableEntry add(String text) {
-        throw new NotImplementedException();
+        SymbolTableEntry item = new SymbolTableEntry(text);
+        items.add(item);
+        return item;
     }
 
     /**
@@ -45,7 +58,11 @@ public class SymbolTable {
      * @return 该符号的条目是否位于符号表中
      */
     public boolean has(String text) {
-        throw new NotImplementedException();
+        for (SymbolTableEntry item : items) {
+            if (item.getText().equals(text))
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -54,7 +71,11 @@ public class SymbolTable {
      * @return 符号表的所有条目
      */
     private Map<String, SymbolTableEntry> getAllEntries() {
-        throw new NotImplementedException();
+        HashMap<String, SymbolTableEntry> map = new HashMap<>();
+        for (SymbolTableEntry item : items) {
+            map.put(item.getText(), item);
+        }
+        return map;
     }
 
     /**
