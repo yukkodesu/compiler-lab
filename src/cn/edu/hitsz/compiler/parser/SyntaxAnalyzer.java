@@ -2,13 +2,13 @@ package cn.edu.hitsz.compiler.parser;
 
 import cn.edu.hitsz.compiler.NotImplementedException;
 import cn.edu.hitsz.compiler.lexer.Token;
-import cn.edu.hitsz.compiler.parser.table.LRTable;
-import cn.edu.hitsz.compiler.parser.table.Production;
-import cn.edu.hitsz.compiler.parser.table.Status;
+import cn.edu.hitsz.compiler.parser.table.*;
 import cn.edu.hitsz.compiler.symtab.SymbolTable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
 //TODO: 实验二: 实现 LR 语法分析驱动程序
 
@@ -21,12 +21,46 @@ import java.util.List;
  * 除非你已经同助教充分沟通, 并能证明你的修改的合理性, 且令助教确定可能被改动的评测方法. 随意修改该类的其它部分有可能导致自动评测出错而被扣分.
  */
 public class SyntaxAnalyzer {
+    class Symbol {
+        Token token;
+        NonTerminal nonTerminal;
+
+        private Symbol(Token token, NonTerminal nonTerminal) {
+            this.token = token;
+            this.nonTerminal = nonTerminal;
+        }
+
+        public Symbol(Token token) {
+            this.token = token;
+            this.nonTerminal = null;
+        }
+
+        public Symbol(NonTerminal nonTerminal) {
+            this.token = null;
+            this.nonTerminal = nonTerminal;
+        }
+
+        public boolean isToken() {
+            return this.token != null;
+        }
+
+        public boolean isNonterminal() {
+            return this.nonTerminal != null;
+        }
+    }
+
     private final SymbolTable symbolTable;
     private final List<ActionObserver> observers = new ArrayList<>();
+    private Iterable<Token> tokens;
+    private LRTable lrTable;
+    private Stack<Status> statusStack;
+    private Stack<Symbol> symbolStack;
 
 
     public SyntaxAnalyzer(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
+        statusStack = new Stack<>();
+        symbolStack = new Stack<>();
     }
 
     /**
@@ -79,14 +113,16 @@ public class SyntaxAnalyzer {
         // 你可以自行选择要如何存储词法单元, 譬如使用迭代器, 或是栈, 或是干脆使用一个 list 全存起来
         // 需要注意的是, 在实现驱动程序的过程中, 你会需要面对只读取一个 token 而不能消耗它的情况,
         // 在自行设计的时候请加以考虑此种情况
-        throw new NotImplementedException();
+//        throw new NotImplementedException();
+        this.tokens = tokens;
     }
 
     public void loadLRTable(LRTable table) {
         // TODO: 加载 LR 分析表
         // 你可以自行选择要如何使用该表格:
         // 是直接对 LRTable 调用 getAction/getGoto, 抑或是直接将 initStatus 存起来使用
-        throw new NotImplementedException();
+//        throw new NotImplementedException();
+        this.lrTable = table;
     }
 
     public void run() {
@@ -94,6 +130,40 @@ public class SyntaxAnalyzer {
         // 你需要根据上面的输入来实现 LR 语法分析的驱动程序
         // 请分别在遇到 Shift, Reduce, Accept 的时候调用上面的 callWhenInShift, callWhenInReduce, callWhenInAccept
         // 否则用于为实验二打分的产生式输出可能不会正常工作
-        throw new NotImplementedException();
+//        throw new NotImplementedException();
+        statusStack.push(lrTable.getInit());
+        symbolStack.push(new Symbol(Token.eof()));
+        Status s;
+        Action action;
+        Token t;
+        Iterator<Token> iter = tokens.iterator();
+        t = iter.next();
+        while (true) {
+            s = statusStack.peek();
+            action = lrTable.getAction(s, t);
+            switch (action.getKind()) {
+                case Shift -> {
+                    symbolStack.push(new Symbol(t));
+                    statusStack.push(action.getStatus());
+                    callWhenInShift(s, t);
+                    t = iter.next();
+                }
+                case Reduce -> {
+                    Production p = action.getProduction();
+                    p.body().forEach(it -> {
+                        statusStack.pop();
+                        symbolStack.pop();
+                    });
+                    symbolStack.push(new Symbol(p.head()));
+                    s = statusStack.peek();
+                    statusStack.push(lrTable.getGoto(s, p.head()));
+                    callWhenInReduce(s, p);
+                }
+                case Accept -> {
+                    callWhenInAccept(s);
+                    return;
+                }
+            }
+        }
     }
 }
