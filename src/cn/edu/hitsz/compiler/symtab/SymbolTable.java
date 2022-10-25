@@ -1,12 +1,8 @@
 package cn.edu.hitsz.compiler.symtab;
 
-import cn.edu.hitsz.compiler.NotImplementedException;
 import cn.edu.hitsz.compiler.utils.FileUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 符号表
@@ -31,11 +27,7 @@ public class SymbolTable {
      * @throws RuntimeException 该符号在表中不存在
      */
     public SymbolTableEntry get(String text) {
-        for (SymbolTableEntry item : items) {
-            if (item.getText().equals(text))
-                return item;
-        }
-        return null;
+        return items.stream().filter(it -> it.getText().equals(text)).findFirst().orElse(null);
     }
 
     /**
@@ -46,9 +38,12 @@ public class SymbolTable {
      * @throws RuntimeException 该符号已在表中存在
      */
     public SymbolTableEntry add(String text) {
-        SymbolTableEntry item = new SymbolTableEntry(text);
-        items.add(item);
-        return item;
+        if (has(text)) {
+            throw new RuntimeException();
+        }
+        SymbolTableEntry it = new SymbolTableEntry(text);
+        items.add(it);
+        return it;
     }
 
     /**
@@ -58,11 +53,7 @@ public class SymbolTable {
      * @return 该符号的条目是否位于符号表中
      */
     public boolean has(String text) {
-        for (SymbolTableEntry item : items) {
-            if (item.getText().equals(text))
-                return true;
-        }
-        return false;
+        return items.stream().anyMatch(it -> it.getText().equals(text));
     }
 
     /**
