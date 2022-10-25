@@ -143,13 +143,14 @@ public class SyntaxAnalyzer {
             action = lrTable.getAction(s, t);
             switch (action.getKind()) {
                 case Shift -> {
+                    callWhenInShift(s, t);
                     symbolStack.push(new Symbol(t));
                     statusStack.push(action.getStatus());
-                    callWhenInShift(s, t);
                     t = iter.next();
                 }
                 case Reduce -> {
                     Production p = action.getProduction();
+                    callWhenInReduce(s, p);
                     p.body().forEach(it -> {
                         statusStack.pop();
                         symbolStack.pop();
@@ -157,7 +158,6 @@ public class SyntaxAnalyzer {
                     symbolStack.push(new Symbol(p.head()));
                     s = statusStack.peek();
                     statusStack.push(lrTable.getGoto(s, p.head()));
-                    callWhenInReduce(s, p);
                 }
                 case Accept -> {
                     callWhenInAccept(s);
