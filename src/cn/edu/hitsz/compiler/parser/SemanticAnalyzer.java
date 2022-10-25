@@ -31,7 +31,7 @@ public class SemanticAnalyzer implements ActionObserver {
 
     @Override
     public void whenReduce(Status currentStatus, Production production) {
-        System.out.println("reduce " + currentStatus.index() + production.toString());
+//        System.out.println("reduce " + currentStatus.index() + production.toString());
 
         // TODO: 该过程在遇到 reduce production 时要采取的代码动作
 //        throw new NotImplementedException();
@@ -44,7 +44,7 @@ public class SemanticAnalyzer implements ActionObserver {
                     info.add(semanticStack.peek());
                     semanticStack.pop();
                 });
-                System.out.println("set " + info.get(0) + " Int");
+//                System.out.println("set " + info.get(0) + " Int");
                 symbolTable.get(info.get(0)).setType(SourceCodeType.Int);
                 semanticStack.push("");
             }
