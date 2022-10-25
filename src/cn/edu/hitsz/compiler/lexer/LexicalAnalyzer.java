@@ -163,7 +163,9 @@ public class LexicalAnalyzer {
             addToken(Token.normal(TokenKind.fromString(text), ""));
         } else {
             addToken(Token.normal("id", text));
-            symbolTable.add(text);
+            if (!symbolTable.has(text)) {
+                symbolTable.add(text);
+            }
         }
     }
 }
