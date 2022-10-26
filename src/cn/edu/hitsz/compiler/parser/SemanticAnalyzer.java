@@ -31,14 +31,14 @@ public class SemanticAnalyzer implements ActionObserver {
 
     @Override
     public void whenReduce(Status currentStatus, Production production) {
-//        System.out.println("reduce " + currentStatus.index() + production.toString());
+//        System.out.println("reduce " + production.index() + production.toString());
 
         // TODO: 该过程在遇到 reduce production 时要采取的代码动作
 //        throw new NotImplementedException();
-        switch (currentStatus.index()) {
+        switch (production.index()) {
             case 5 -> {
             }
-            case 8 -> {
+            case 4 -> {
                 ArrayList<String> info = new ArrayList<>();
                 production.body().forEach(it -> {
                     info.add(semanticStack.peek());
