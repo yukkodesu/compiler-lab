@@ -53,8 +53,8 @@ public class SyntaxAnalyzer {
     private final List<ActionObserver> observers = new ArrayList<>();
     private Iterable<Token> tokens;
     private LRTable lrTable;
-    private Stack<Status> statusStack;
-    private Stack<Symbol> symbolStack;
+    private final Stack<Status> statusStack;
+    private final Stack<Symbol> symbolStack;
 
 
     public SyntaxAnalyzer(SymbolTable symbolTable) {

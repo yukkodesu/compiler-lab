@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class SymbolTable {
 
-    private ArrayList<SymbolTableEntry> items;
+    private final ArrayList<SymbolTableEntry> items;
 
     public SymbolTable() {
         items = new ArrayList<>();

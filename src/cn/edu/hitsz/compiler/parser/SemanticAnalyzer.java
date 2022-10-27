@@ -1,23 +1,19 @@
 package cn.edu.hitsz.compiler.parser;
 
-import cn.edu.hitsz.compiler.NotImplementedException;
 import cn.edu.hitsz.compiler.lexer.Token;
 import cn.edu.hitsz.compiler.parser.table.Production;
 import cn.edu.hitsz.compiler.parser.table.Status;
 import cn.edu.hitsz.compiler.symtab.SourceCodeType;
 import cn.edu.hitsz.compiler.symtab.SymbolTable;
-import cn.edu.hitsz.compiler.symtab.SymbolTableEntry;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Stack;
 
 // TODO: 实验三: 实现语义分析
 public class SemanticAnalyzer implements ActionObserver {
 
+    private final Stack<String> semanticStack = new Stack<>();
     private SymbolTable symbolTable;
-
-    private Stack<String> semanticStack = new Stack<>();
 
     public SemanticAnalyzer() {
         semanticStack.push("$");
@@ -44,14 +40,13 @@ public class SemanticAnalyzer implements ActionObserver {
                     info.add(semanticStack.peek());
                     semanticStack.pop();
                 });
+//                info.forEach(System.out::println);
 //                System.out.println("set " + info.get(0) + " Int");
                 symbolTable.get(info.get(0)).setType(SourceCodeType.Int);
                 semanticStack.push("");
             }
             default -> {
-                production.body().forEach(it -> {
-                    semanticStack.pop();
-                });
+                production.body().forEach(it -> semanticStack.pop());
                 semanticStack.push("");
             }
         }
@@ -62,15 +57,12 @@ public class SemanticAnalyzer implements ActionObserver {
         // TODO: 该过程在遇到 shift 时要采取的代码动作
 //        throw new NotImplementedException();
         switch (currentToken.getKindId()) {
-            case "int" -> {
-                semanticStack.push("int");
-            }
-            case "id" -> {
-                semanticStack.push(currentToken.getText());
-            }
-            default -> {
-                semanticStack.push("");
-            }
+            case "int" -> semanticStack.push("int");
+
+            case "id" -> semanticStack.push(currentToken.getText());
+
+            default -> semanticStack.push("");
+
         }
     }
 
