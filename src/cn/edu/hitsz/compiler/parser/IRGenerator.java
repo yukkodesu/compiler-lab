@@ -57,8 +57,10 @@ public class IRGenerator implements ActionObserver {
                     info.add(semanticStack.peek());
                     semanticStack.pop();
                 });
-                System.out.printf("Mov %s %s\n", info.get(2), info.get(0));
-                instructionAdd(Instruction.createMov((IRVariable) getIRValue(info.get(2)), getIRValue(info.get(0))));
+                String strVal1 = info.get(2);
+                String strVal2 = info.get(0);
+                System.out.printf("Mov %s %s\n", strVal1, strVal2);
+                instructionAdd(Instruction.createMov((IRVariable) getIRValue(strVal1), getIRValue(strVal2)));
                 semanticStack.push(info.get(2));
             }
             case 8, 9, 11 -> {//E -> E +/- A; //A -> A * B;
@@ -69,19 +71,21 @@ public class IRGenerator implements ActionObserver {
                 IRVariable var = IRVariable.temp();
                 irValues.put(var.getName(), var);
 //                System.out.printf("Push %s\n", var.getName());
+                String strVal1 = info.get(2);
+                String strVal2 = info.get(0);
                 semanticStack.push(var.getName());
                 switch (info.get(1)) {
                     case "+" -> {
-                        instructionAdd(Instruction.createAdd(var, getIRValue(info.get(2)), getIRValue(info.get(0))));
-                        System.out.printf("Add %s %s %s\n", var, info.get(2), info.get(0));
+                        instructionAdd(Instruction.createAdd(var, getIRValue(strVal1), getIRValue(strVal2)));
+                        System.out.printf("Add %s %s %s\n", var, strVal1, strVal2);
                     }
                     case "-" -> {
-                        instructionAdd(Instruction.createSub(var, getIRValue(info.get(2)), getIRValue(info.get(0))));
-                        System.out.printf("Sub %s %s %s\n", var, info.get(2), info.get(0));
+                        instructionAdd(Instruction.createSub(var, getIRValue(strVal1), getIRValue(strVal2)));
+                        System.out.printf("Sub %s %s %s\n", var, strVal1, strVal2);
                     }
                     case "*" -> {
-                        System.out.printf("Mul %s %s %s\n", var, info.get(2), info.get(0));
-                        instructionAdd(Instruction.createMul(var, getIRValue(info.get(2)), getIRValue(info.get(0))));
+                        System.out.printf("Mul %s %s %s\n", var, strVal1, strVal2);
+                        instructionAdd(Instruction.createMul(var, getIRValue(strVal1), getIRValue(strVal2)));
                     }
                 }
             }
