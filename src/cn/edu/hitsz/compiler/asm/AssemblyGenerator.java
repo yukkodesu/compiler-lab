@@ -80,13 +80,12 @@ public class AssemblyGenerator {
             irMap.put(firstAvailable, ir);
             regMap.put(ir, firstAvailable);
         } else {
-            int firstTemp = IntStream.range(lastRecycle, 7)
-                    .filter(it -> isTemp[it])
-                    .findFirst()
-                    .orElse(0);
-            lastRecycle = (firstTemp + 1) % 7;
-            irMap.put(firstTemp, ir);
-            regMap.put(ir, firstTemp);
+            while (isTemp[lastRecycle]) {
+                lastRecycle = (lastRecycle + 1) % 7;
+            }
+            irMap.put(lastRecycle, ir);
+            regMap.put(ir, lastRecycle);
+            lastRecycle = (lastRecycle + 1) % 7;
         }
     }
 
