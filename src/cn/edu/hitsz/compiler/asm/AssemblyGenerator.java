@@ -92,12 +92,13 @@ public class AssemblyGenerator {
     public void run() {
         // TODO: 执行寄存器分配与代码生成
 //        throw new NotImplementedException();
+
         System.out.println("---- ASM Gen ----");
         for (int i = 0; i < 7; i++) {
             isAlloc[i] = false;
             isTemp[i] = false;
         }
-
+        asm.add(".text");
         int index = 0;
         for (Instruction instruction : irInstruction) {
             switch (instruction.getKind()) {
@@ -110,10 +111,10 @@ public class AssemblyGenerator {
                     Integer regResult = regMap.get(result);
                     if (from.isImmediate()) {
                         IRImmediate immFrom = (IRImmediate) from;
-                        asm.add("li t%d %d".formatted(regResult, immFrom.getValue()));
+                        asm.add("\tli t%d %d".formatted(regResult, immFrom.getValue()));
                     } else {
                         Integer regFrom = regMap.get(from);
-                        asm.add("mv t%d t%d".formatted(regResult, regFrom));
+                        asm.add("\tmv t%d t%d".formatted(regResult, regFrom));
                     }
                 }
                 case ADD -> {
@@ -128,7 +129,7 @@ public class AssemblyGenerator {
                         Integer regLHS = regMap.get(lhs);
                         Integer regRHS = regMap.get(rhs);
                         asm.add(
-                                "add t%d t%d t%d"
+                                "\tadd t%d t%d t%d"
                                         .formatted(regResult, regLHS, regRHS)
                         );
                     } else {
@@ -137,7 +138,7 @@ public class AssemblyGenerator {
                         Integer regResult = regMap.get(result);
                         Integer regVar = regMap.get(isLhsImm ? rhs : lhs);
                         asm.add(
-                                "addi t%d t%d %d"
+                                "\taddi t%d t%d %d"
                                         .formatted(regResult, regVar, imm.getValue())
                         );
                     }
@@ -154,7 +155,7 @@ public class AssemblyGenerator {
                         Integer regLHS = regMap.get(lhs);
                         Integer regRHS = regMap.get(rhs);
                         asm.add(
-                                "sub t%d t%d t%d"
+                                "\tsub t%d t%d t%d"
                                         .formatted(regResult, regLHS, regRHS)
                         );
                     } else {
@@ -167,11 +168,11 @@ public class AssemblyGenerator {
                             Integer regRHS = regMap.get(rhs);
                             Integer regLHS = regMap.get(lhs);
                             asm.add(
-                                    "li t%d %d"
+                                    "\tli t%d %d"
                                             .formatted(regLHS, imm.getValue())
                             );
                             asm.add(
-                                    "sub t%d t%d t%d"
+                                    "\tsub t%d t%d t%d"
                                             .formatted(regResult, regLHS, regRHS)
                             );
                         } else {
@@ -179,7 +180,7 @@ public class AssemblyGenerator {
                             Integer regResult = regMap.get(result);
                             Integer regLHS = regMap.get(lhs);
                             asm.add(
-                                    "addi t%d t%d t%d"
+                                    "\taddi t%d t%d t%d"
                                             .formatted(regResult, regLHS, -imm.getValue())
                             );
                         }
@@ -197,7 +198,7 @@ public class AssemblyGenerator {
                         Integer regLHS = regMap.get(lhs);
                         Integer regRHS = regMap.get(rhs);
                         asm.add(
-                                "mul t%d t%d t%d"
+                                "\tmul t%d t%d t%d"
                                         .formatted(regResult, regLHS, regRHS)
                         );
                     } else {
@@ -210,18 +211,18 @@ public class AssemblyGenerator {
                         Integer regRHS = regMap.get(rhs);
                         Integer regLHS = regMap.get(lhs);
                         asm.add(
-                                "li t%d %d"
+                                "\tli t%d %d"
                                         .formatted(isLhsImm ? regLHS : regRHS, imm.getValue())
                         );
                         asm.add(
-                                "mul t%d t%d t%d"
+                                "\tmul t%d t%d t%d"
                                         .formatted(regResult, isLhsImm ? regRHS : regLHS, isLhsImm ? regLHS : regRHS)
                         );
                     }
                 }
                 case RET -> {
                     IRValue ret = instruction.getReturnValue();
-                    asm.add("mv a0 t%d".formatted(regMap.get(ret)));
+                    asm.add("\tmv a0 t%d".formatted(regMap.get(ret)));
                 }
             }
         }
